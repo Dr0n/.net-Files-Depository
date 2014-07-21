@@ -1,0 +1,84 @@
+﻿@using FilesDepositoryApplication.Models.Info
+@model IList<FilesDepositoryApplication.Models.SqlRepository.File>
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@section scripts {
+@Scripts.Render("~/bundles/jqueryui")
+@Scripts.Render("~/bundles/file-uploads")
+
+    @Scripts.Render("/Scripts/default/home-index.js")
+    
+}
+@section styles
+{
+    @Styles.Render("~/Content/themes/base/css")    
+@Styles.Render("~/Content/file-uploads/css")
+}
+@helper Truncate(string input, int length, String endPart = "...")
+{
+    if (input.Length <= length)
+    {
+        @Html.Raw(input)
+    }
+    else
+    {
+        var thisString = input.Substring(0, (length-endPart.Length)) + endPart;
+        @Html.Raw(thisString)
+    }
+}
+@helper FileIconByFileFormat(String fileFormat, String title){
+    var linkToIcon = String.Format("/Content/img/depositoryicons/{0}.png", fileFormat);
+    <img src="@linkToIcon" onerror="this.onerror = null; this.src = '/Content/img/depositoryicons/missing.png';" title="@title"/>
+}
+<div class="contolPanel">
+    <div class="searchContainer">
+        <form method="get" class="searchform" action="/">
+            <label>
+                <input type="text" name="s" value="@ViewBag.SearchFilter" placeholder="Search...">
+            </label>
+        </form>
+
+    </div>
+    <span class="uploadContainer">
+        <input id="fileupload" type="file" name="file" data-url="Home/Upload/" class="uploadBtn" value="Choose files">
+    </span>
+</div>
+@if (!String.IsNullOrWhiteSpace(@ViewBag.SearchFilter))
+{
+    <div class="filter-caption">Search Results for:<span>@ViewBag.SearchFilter</span></div>
+}
+<div class="filesContainer">
+    @if (Model.Count == 0)
+    {
+        <div id="emptyFiles">
+            @if (!String.IsNullOrWhiteSpace(@ViewBag.SearchFilter))
+            {
+                @Html.Raw("Nothing Found. Please change search criteria.");
+            }
+            else
+            {
+                @Html.Raw("Files are not loaded yet. Please Download using the button at the top.");
+            }
+        </div>
+    }
+    @foreach (var file in Model)
+    {
+        <div class="imgContainer">
+            @FileIconByFileFormat(@file.type, @file.original_name)
+            <input data-id="@file.Id" type="image" class="removeFileIcon" src="~/Content/img/erase.png" title="Delete" />
+            <input data-id="@file.Id" type="image" class="downloadFileIcon" src="~/Content/img/download.png" title="Download" />
+            <span class="fileName" title="@file.original_name">@Truncate(@file.original_name, 16)</span>
+        </div>
+    }
+</div>
+<div id="dialog-confirm" title="Delete item?" class="dialogs">
+    <p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>Item: "<span class="dialogText">ITEM</span>" will be permanently deleted and cannot be recovered. Are you sure?</p>
+</div>
+<div id="dialog-download" title="Download item?" class="dialogs">
+    <p><span class="ui-icon ui-icon-info" style="float:left; margin:0 7px 20px 0;"></span>Are you sure want to download: "<span class="dialogText">ITEM</span>"?</p>
+</div>
+<div id="dialog-error" title="Error" class="dialogs">
+    <p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span><span class="dialogText"></span></p>
+</div>
