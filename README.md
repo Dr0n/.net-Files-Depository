@@ -6,6 +6,6 @@ Deployment:
 
 2) Apply /App_Data/Create.sql
 
-3) Change " <connectionStrings>" in Web.config to your DB
+3) Change "connectionStrings" in Web.config to your DB
 
 
